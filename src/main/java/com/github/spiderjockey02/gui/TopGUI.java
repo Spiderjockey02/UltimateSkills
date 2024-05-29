@@ -19,11 +19,9 @@ import java.util.List;
 
 public class TopGUI implements GUI {
     private final UUID uuid;
-    private final SkillType type;
 
-    public TopGUI(Player player, SkillType type) {
+    public TopGUI(Player player) {
         this.uuid = player.getUniqueId();
-        this.type = type;
     }
 
     @Override
@@ -35,11 +33,12 @@ public class TopGUI implements GUI {
     public Inventory getInventory() {
         SkillManager skillManager =  UltimateSkills.getInstance().getSkillManager();
         Inventory inventory = Bukkit.createInventory(this, 36, StringUtils.color("&lSKILL TOP"));
-        List<PlayerData> topPlayers = skillManager.getTopPlayers(type, 5);
+        List<PlayerData> topPlayers = skillManager.getTopPlayers();
 
         int index = 0;
         List<Integer> positions = List.of(4,12,14,20,24);
         for (PlayerData playerData : topPlayers) {
+            if (index > 4) break;
             ItemStack head = this.createHead(playerData);
             inventory.setItem(positions.get(index), head);
             index++;
@@ -61,8 +60,7 @@ public class TopGUI implements GUI {
 
         // Add Lore
         ArrayList<String> lore = new ArrayList<String>();
-        lore.add(StringUtils.color("&fLevel: " + playerData.getSkill(this.type).getLevel()));
-        lore.add(StringUtils.color("&fExperience: " + playerData.getSkill(this.type).getPoints()));
+        lore.add(StringUtils.color("&fExperience: " + playerData.getTotalPoints()));
         skullMeta.setLore(lore);
         skull.setItemMeta(skullMeta);
 

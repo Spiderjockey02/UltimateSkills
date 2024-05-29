@@ -5,14 +5,12 @@ import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.objects.PlayerData;
 import com.github.spiderjockey02.objects.PlayerSkill;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class DatabaseManager {
+public class SQLDatabase extends Database  {
     private final Connection connection;
 
-    public DatabaseManager(String path) throws SQLException {
+    public SQLDatabase(String path) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
         try (Statement statement = connection.createStatement()) {
@@ -28,7 +26,6 @@ public class DatabaseManager {
             statement.execute("CREATE TABLE IF NOT EXISTS Players (" +
                     "uuid TEXT PRIMAY KEY, " +
                     "skills TEXT, " +
-                    "totalLevel INTEGER NOT NULL DEFAULT 0, " +
                     "totalPoints INTEGER NOT NULL DEFAULT 0, " +
                     "FOREIGN KEY(skills) REFERENCES Skills(uuid))");
         }
@@ -44,9 +41,8 @@ public class DatabaseManager {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String uuid = resultSet.getString("uuid");
-                    int level = resultSet.getInt("totalLevel");
                     int points = resultSet.getInt("totalPoints");
-                    return new PlayerData(uuid, level, points);
+                    return new PlayerData(uuid, points);
                 }
             }
         } catch (SQLException e) {
@@ -112,7 +108,7 @@ public class DatabaseManager {
         return -1;
     }
 
-    public Map<SkillType, PlayerSkill> updatePlayerSkill(UUID playerId, SkillType type, Integer newLevel, Integer newPoint) throws  SQLException {
+    public Map<SkillType, PlayerSkill> updatePlayerSkill(UUID playerId, SkillType type, Integer newLevel, Integer newPoint) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement("UPDATE Skills SET level = ?, points = ? WHERE uuid = ? AND type = ?")) {
             statement.setInt(1, newLevel);
             statement.setInt(2, newPoint);
@@ -123,21 +119,47 @@ public class DatabaseManager {
         }
     }
 
-    public PlayerData updatePlayer(UUID playerId, Integer newLevel, Integer newPoints) {
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET totalLevel = ?, totalPoints = ? WHERE uuid = ?")) {
-            statement.setInt(1, newLevel);
-            statement.setInt(2, newPoints);
-            statement.setString(3, playerId.toString());
-            ResultSet data = statement.executeQuery();
-            if (data.next()) {
-                String uuid = data.getString("uuid");
-                int level = data.getInt("totalLevel");
-                int points = data.getInt("totalPoints");
-                return new PlayerData(uuid, level, points);
-            }
+    public Integer updatePlayer(UUID playerId, Integer newPoints) {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET totalPoints = ? WHERE uuid = ?")) {
+            statement.setInt(1, newPoints);
+            statement.setString(2, playerId.toString());
+            return statement.executeUpdate();
         } catch (SQLException e) {
             UltimateSkills.getInstance().getLogger().info(e.getMessage());
         }
-        return null;
+        return -1;
+    }
+
+    public List<PlayerData> getTopPlayers() {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Players ORDER BY totalPoints DESC LIMIT 10")) {
+            ResultSet data = statement.executeQuery();
+            List<PlayerData> players = new ArrayList<>();
+            while (data.next()) {
+                String uuid = data.getString("uuid");
+                int points = data.getInt("totalPoints");
+                players.add(new PlayerData(uuid, points));
+            }
+            return players;
+        } catch (SQLException e) {
+            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+        }
+        return List.of();
+    }
+
+    public List<PlayerData> getTopPlayersBySkillType(SkillType skillType) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Skills ORDER BY points DESC LIMIT 10 WHERE type = ?")) {
+            statement.setString(1, skillType.toString());
+            ResultSet data = statement.executeQuery();
+            List<PlayerData> players = new ArrayList<>();
+            while (data.next()) {
+                String uuid = data.getString("uuid");
+                int points = data.getInt("totalPoints");
+                players.add(new PlayerData(uuid, points));
+            }
+            return players;
+        } catch (SQLException e) {
+            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+        }
+        return List.of();
     }
 }

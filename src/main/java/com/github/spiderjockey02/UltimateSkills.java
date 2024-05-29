@@ -1,8 +1,9 @@
 package com.github.spiderjockey02;
 
 import com.github.spiderjockey02.commands.CommandManager;
-import com.github.spiderjockey02.config.ConfigManager;
-import com.github.spiderjockey02.database.DatabaseManager;
+import com.github.spiderjockey02.managers.ConfigManager;
+import com.github.spiderjockey02.database.Database;
+import com.github.spiderjockey02.database.SQLDatabase;
 import com.github.spiderjockey02.listeners.BlockBreakListener;
 import com.github.spiderjockey02.listeners.EntityDeathListener;
 import com.github.spiderjockey02.listeners.FishingListener;
@@ -17,7 +18,7 @@ public class UltimateSkills  extends JavaPlugin {
     private SkillManager skillManager;
     private CommandManager commandManager;
     private ConfigManager configManager;
-    private DatabaseManager databaseManager;
+    private Database SQLDatabase;
 
     @Override
     public void onEnable() {
@@ -38,7 +39,7 @@ public class UltimateSkills  extends JavaPlugin {
 
         // Initialise database
         try {
-            this.databaseManager = new DatabaseManager(getDataFolder().getAbsolutePath() + "/skills.db");
+            this.SQLDatabase = new SQLDatabase(getDataFolder().getAbsolutePath() + "/skills.db");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -47,7 +48,7 @@ public class UltimateSkills  extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
-            this.databaseManager.closeConnection();
+            this.SQLDatabase.closeConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -61,8 +62,12 @@ public class UltimateSkills  extends JavaPlugin {
         return this.configManager;
     }
 
-    public  DatabaseManager getDatabaseManager() {
-        return this.databaseManager;
+    public Database getDatabaseManager() {
+        return this.SQLDatabase;
+    }
+
+    public CommandManager getCommandManager() {
+        return this.commandManager;
     }
 
     public static UltimateSkills getInstance() {

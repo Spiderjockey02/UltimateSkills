@@ -2,7 +2,6 @@ package com.github.spiderjockey02.objects;
 
 import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
-
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -19,9 +18,10 @@ public class PlayerSkill {
         this.points = points;
     }
 
-    public void addPoints(Integer points){
+    public void addPoints(Integer points) {
         Integer newPoints = points + this.points;
         try {
+            // Update skill type level and overall level
             UltimateSkills.getInstance().getDatabaseManager().updatePlayerSkill(this.uuid, this.type, this.level, newPoints);
             this.points = newPoints;
         } catch (SQLException e) {
@@ -31,6 +31,7 @@ public class PlayerSkill {
 
     public void updateLevel(Integer newLevel){
         try {
+            // Update skill type level and overall level
             UltimateSkills.getInstance().getDatabaseManager().updatePlayerSkill(this.uuid, this.type, newLevel, this.points);
             this.level = newLevel;
         } catch (SQLException e) {

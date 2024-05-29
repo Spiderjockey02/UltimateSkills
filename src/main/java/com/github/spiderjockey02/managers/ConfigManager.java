@@ -1,4 +1,4 @@
-package com.github.spiderjockey02.config;
+package com.github.spiderjockey02.managers;
 
 import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;

@@ -17,7 +17,7 @@ public class TopCommand extends UltimateCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         Player p = (Player) sender;
-        p.openInventory(new TopGUI(p, SkillType.MINING).getInventory());
+        p.openInventory(new TopGUI(p).getInventory());
     }
 
     @Override

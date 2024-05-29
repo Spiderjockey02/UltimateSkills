@@ -12,7 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SkillManager {
     private final UltimateSkills plugin;
@@ -54,8 +53,10 @@ public class SkillManager {
         // Fetch or create player skill data
         PlayerSkill playerSkill = this.getPlayerSkill(playerId,type);
 
-        // Add XP to user
+        // Add XP to user and refresh cache
         playerSkill.addPoints(points);
+        playerData.updateTotalPoints(points);
+        this.tempData.put(playerId, playerData);
 
         // Check for level up
         int level = playerSkill.getLevel();
@@ -134,12 +135,12 @@ public class SkillManager {
         return -1;
     }
 
-    public List<PlayerData> getTopPlayers(SkillType skillType, int topN) {
+    public List<PlayerData> getTopPlayersBySkillType(SkillType skillType) {
         // Fetch from database instead
-        return tempData.values().stream()
-                .filter(data -> data.getSkill(skillType) != null)
-                .sorted(Comparator.comparingInt(data -> data.getSkill(skillType).getPoints()))
-                .limit(topN)
-                .collect(Collectors.toList());
+        return this.plugin.getDatabaseManager().getTopPlayersBySkillType(skillType);
+    }
+
+    public List<PlayerData> getTopPlayers() {
+        return this.plugin.getDatabaseManager().getTopPlayers();
     }
 }

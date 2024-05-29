@@ -1,5 +1,6 @@
 package com.github.spiderjockey02.objects;
 
+import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
 
 import java.util.HashMap;
@@ -8,13 +9,11 @@ import java.util.UUID;
 
 public class PlayerData {
     private final UUID uuid;
-    private final Integer totalLevel;
-    private final Integer totalPoints;
+    private Integer totalPoints;
     public final Map<SkillType, PlayerSkill> skills = new HashMap<>();
 
-    public PlayerData(String uuid, Integer totalPoints, Integer totalLevel) {
+    public PlayerData(String uuid, Integer totalPoints) {
         this.totalPoints = totalPoints;
-        this.totalLevel = totalLevel;
         this.uuid = UUID.fromString(uuid);
     }
 
@@ -22,12 +21,13 @@ public class PlayerData {
         return uuid;
     }
 
-    public Integer getTotalLevel() {
-        return totalLevel;
-    }
-
     public Integer getTotalPoints() {
         return totalPoints;
+    }
+
+    public void updateTotalPoints(Integer points) {
+        this.totalPoints+= points;
+        UltimateSkills.getInstance().getDatabaseManager().updatePlayer(this.uuid, this.totalPoints);
     }
 
     public PlayerSkill getSkill(SkillType skillType) {
