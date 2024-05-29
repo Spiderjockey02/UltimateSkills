@@ -26,6 +26,7 @@ public class ConfigManager {
 
     public void fetchLevels() {
         ConfigurationSection levelSection = this.plugin.getConfig().getConfigurationSection("levels");
+        if (levelSection == null) return;
 
         for(String key : levelSection.getKeys(false)){
             int xpNeeded = this.plugin.getConfig().getInt("levels." + key + ".xpneeded");

@@ -2,7 +2,6 @@ package com.github.spiderjockey02.utils;
 
 import com.google.common.base.Strings;
 import org.bukkit.ChatColor;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

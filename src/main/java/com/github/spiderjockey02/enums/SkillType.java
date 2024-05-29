@@ -33,5 +33,16 @@ public enum SkillType {
             });
         }};
     }
+
+    public static SkillType fromString(String skillName) {
+        if (skillName == null || skillName.isEmpty()) {
+            throw new IllegalArgumentException("Skill name cannot be null or empty");
+        }
+        try {
+            return SkillType.valueOf(skillName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("No enum constant for skill name: " + skillName);
+        }
+    }
 }
 

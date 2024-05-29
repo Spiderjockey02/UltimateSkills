@@ -35,7 +35,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         for (UltimateCommand command : commands) {
             // We don't want to execute other commands or ones that are disabled
             if (!command.aliases.isEmpty() && !(command.aliases.contains(args[0]) && command.enabled)) {

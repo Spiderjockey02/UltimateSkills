@@ -3,7 +3,8 @@ package com.github.spiderjockey02.gui;
 import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.managers.SkillManager;
-import com.github.spiderjockey02.objects.playerData;
+import com.github.spiderjockey02.objects.PlayerData;
+import com.github.spiderjockey02.objects.PlayerSkill;
 import com.github.spiderjockey02.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,7 +29,7 @@ public class ProfileGUI implements GUI {
     // Build the Main Profile GUI
     public Inventory getInventory() {
         SkillManager skillManager = UltimateSkills.getInstance().getSkillManager();
-        playerData data = skillManager.getPlayerData(this.uuid);
+        PlayerData data = skillManager.getPlayerData(this.uuid);
 
         Inventory inventory = Bukkit.createInventory(this, 27, StringUtils.color("&lSkills"));
         List<ItemStack> items = this.createSkillItem(data, skillManager);
@@ -51,14 +52,18 @@ public class ProfileGUI implements GUI {
         }
     }
 
-    private List<ItemStack> createSkillItem(playerData data, SkillManager skillManager) {
+    private List<ItemStack> createSkillItem(PlayerData data, SkillManager skillManager) {
         List<Material> materials = List.of(Material.STONE, Material.WHEAT, Material.DIAMOND_SWORD, Material.FISHING_ROD, Material.DIAMOND_AXE);
         List<ItemStack> items = new ArrayList<>();
         int index = 0;
         for (SkillType skillType : SkillType.values()) {
             // Get player stats
-            int currentXp = data.skills.get(skillType).getXp();
-            int currentLvl = data.skills.get(skillType).getLevel();
+            PlayerSkill playerSkill = data.getSkill(skillType);
+            int currentLvl = 0, currentXp = 0;
+            if (playerSkill != null) {
+                currentXp = data.getSkill(skillType).getPoints();
+                currentLvl = data.getSkill(skillType).getLevel();
+            }
 
             // Create item
             ItemStack item = new ItemStack(materials.get(index));

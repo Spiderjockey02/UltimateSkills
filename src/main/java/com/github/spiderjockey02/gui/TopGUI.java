@@ -3,7 +3,7 @@ package com.github.spiderjockey02.gui;
 import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.managers.SkillManager;
-import com.github.spiderjockey02.objects.playerData;
+import com.github.spiderjockey02.objects.PlayerData;
 import com.github.spiderjockey02.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,11 +35,11 @@ public class TopGUI implements GUI {
     public Inventory getInventory() {
         SkillManager skillManager =  UltimateSkills.getInstance().getSkillManager();
         Inventory inventory = Bukkit.createInventory(this, 36, StringUtils.color("&lSKILL TOP"));
-        List<playerData> topPlayers = skillManager.getTopPlayers(type, 5);
+        List<PlayerData> topPlayers = skillManager.getTopPlayers(type, 5);
 
         int index = 0;
         List<Integer> positions = List.of(4,12,14,20,24);
-        for (playerData playerData : topPlayers) {
+        for (PlayerData playerData : topPlayers) {
             ItemStack head = this.createHead(playerData);
             inventory.setItem(positions.get(index), head);
             index++;
@@ -49,11 +49,11 @@ public class TopGUI implements GUI {
         return inventory;
     }
 
-    private ItemStack createHead(playerData playerData) {
+    private ItemStack createHead(PlayerData playerData) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         // Get player head
         SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerData.playerId);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerData.getUuid());
         skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getName()));
 
         // Add title
@@ -61,8 +61,8 @@ public class TopGUI implements GUI {
 
         // Add Lore
         ArrayList<String> lore = new ArrayList<String>();
-        lore.add(StringUtils.color("&fLevel: " + playerData.skills.get(this.type).getLevel()));
-        lore.add(StringUtils.color("&fExperience: " + playerData.skills.get(this.type).getXp()));
+        lore.add(StringUtils.color("&fLevel: " + playerData.getSkill(this.type).getLevel()));
+        lore.add(StringUtils.color("&fExperience: " + playerData.getSkill(this.type).getPoints()));
         skullMeta.setLore(lore);
         skull.setItemMeta(skullMeta);
 

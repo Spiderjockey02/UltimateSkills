@@ -4,8 +4,8 @@ import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.managers.SkillManager;
 import com.github.spiderjockey02.objects.LevelData;
-import com.github.spiderjockey02.objects.PlayerSkillData;
-import com.github.spiderjockey02.objects.playerData;
+import com.github.spiderjockey02.objects.PlayerData;
+import com.github.spiderjockey02.objects.PlayerSkill;
 import com.github.spiderjockey02.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -37,7 +37,7 @@ public class LevelGUI implements GUI {
     @Override
     public Inventory getInventory() {
         SkillManager skillManager = UltimateSkills.getInstance().getSkillManager();
-        playerData player =  skillManager.getPlayerData(this.uuid);
+        PlayerData player =  skillManager.getPlayerData(this.uuid);
 
         // Create inventory and layout
         Inventory inventory = Bukkit.createInventory(this, 45, StringUtils.color("&lSKILL " + this.type.getName()));
@@ -47,21 +47,27 @@ public class LevelGUI implements GUI {
         int index = 0;
         Map<Integer, LevelData> levels = UltimateSkills.getInstance().getConfigManager().levels;
         for (Map.Entry<Integer, LevelData> level : levels.entrySet()) {
-            ItemStack item = this.createItem(player.skills.get(this.type), level.getValue(), index+1);
+            ItemStack item = this.createItem(player.getSkill(this.type), level.getValue(), index+1);
             inventory.setItem(positions.get(index), item);
             index++;
         }
 
         // Add Info stats and then return inventory for displaying
-        inventory.setItem(40, this.createInfoItem(player));
+        inventory.setItem(40, this.createInfoItem(player.getSkill(this.type)));
         return inventory;
     }
 
-    private ItemStack createItem(PlayerSkillData skillData, LevelData leveldata, Integer level) {
+    private ItemStack createItem(PlayerSkill skillData, LevelData leveldata, Integer level) {
         ItemStack item;
-        if (skillData.getLevel() >= level) {
+        Integer userLevel = 0, userPoints = 0;
+        if (skillData != null) {
+            userLevel = skillData.getLevel();
+            userPoints = skillData.getPoints();
+        }
+
+        if (userLevel >= level) {
             item = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
-        } else if (skillData.getLevel()+1 == level) {
+        } else if (userLevel+1 == level) {
             item = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
         } else {
             item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
@@ -74,8 +80,8 @@ public class LevelGUI implements GUI {
         // Create lore for player stats
         ArrayList<String> lore = new ArrayList<String>();
         lore.add(StringUtils.color("&fProgress:"));
-        lore.add(StringUtils.color("&fExperience: " + skillData.getXp() +" / " + leveldata.getXpNeeded()));
-        lore.add(StringUtils.color("&fProgress: &8[&r" + StringUtils.getProgressBar(skillData.getXp() , leveldata.getXpNeeded(), 20, '|', "&a", "&c") + "&8]"));
+        lore.add(StringUtils.color("&fExperience: " + userPoints +" / " + leveldata.getXpNeeded()));
+        lore.add(StringUtils.color("&fProgress: &8[&r" + StringUtils.getProgressBar(userPoints, leveldata.getXpNeeded(), 20, '|', "&a", "&c") + "&8]"));
         lore.add("");
         lore.add(StringUtils.color("&fRewards:"));
         lore.addAll(StringUtils.color(leveldata.getLore().stream().map(s -> "&f- " + s).collect(Collectors.toList())));
@@ -86,8 +92,15 @@ public class LevelGUI implements GUI {
         return item;
     }
 
-    private ItemStack createInfoItem(playerData data) {
+    private ItemStack createInfoItem(PlayerSkill data) {
         ItemStack item = new ItemStack(Material.BOOK);
+
+        Integer userLevel = 0, userPoints = 0;
+        if (data != null) {
+            userLevel = data.getLevel();
+            userPoints = data.getPoints();
+        }
+
         ItemMeta itemStackMeta = item.getItemMeta();
         // Create item
         itemStackMeta.setDisplayName(StringUtils.color("&fInfo"));
@@ -95,8 +108,8 @@ public class LevelGUI implements GUI {
         // Create lore for player stats
         ArrayList<String> lore = new ArrayList<String>();
         lore.add(StringUtils.color("&fProgress:"));
-        lore.add(StringUtils.color("&f" + data.skills.get(this.type).getXp()));
-        lore.add(StringUtils.color("&f" + data.skills.get(this.type).getLevel()));
+        lore.add(StringUtils.color("&fXP: " + userPoints));
+        lore.add(StringUtils.color("&fLevel: " + userLevel));
 
         itemStackMeta.setLore(lore);
         item.setItemMeta(itemStackMeta);
