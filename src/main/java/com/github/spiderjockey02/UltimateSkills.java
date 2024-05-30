@@ -1,18 +1,18 @@
 package com.github.spiderjockey02;
 
 import com.github.spiderjockey02.commands.CommandManager;
+import com.github.spiderjockey02.listeners.*;
 import com.github.spiderjockey02.managers.ConfigManager;
 import com.github.spiderjockey02.database.Database;
 import com.github.spiderjockey02.database.implementations.SQLDatabase;
-import com.github.spiderjockey02.listeners.BlockBreakListener;
-import com.github.spiderjockey02.listeners.EntityDeathListener;
-import com.github.spiderjockey02.listeners.FishingListener;
-import com.github.spiderjockey02.listeners.InventoryClickListener;
 import com.github.spiderjockey02.managers.SkillManager;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 public class UltimateSkills  extends JavaPlugin {
     private SkillManager skillManager;
@@ -25,14 +25,18 @@ public class UltimateSkills  extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage("Plugin Has been enabled!");
         // Load managers
         this.skillManager = new SkillManager(this);
-        this.commandManager = new CommandManager(this);
+        this.commandManager = new CommandManager();
         this.configManager = new ConfigManager(this);
 
         // Register events
-        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new EntityDeathListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new FishingListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
+        List<Listener> listeners = Arrays.asList(
+                new BlockBreakListener(this),
+                new EntityDeathListener(this),
+                new FishingListener(this),
+                new InventoryClickListener(),
+                new PlayerListener(this)
+        );
+        this.registerEvents(listeners);
 
         // Fetch config
         this.configManager.saveConfig();
@@ -40,7 +44,7 @@ public class UltimateSkills  extends JavaPlugin {
         // Initialise database
         try {
             // Check if connection should be MySQL or SQLite
-            this.SQLDatabase = new SQLDatabase(getDataFolder().getAbsolutePath() + "/skills.db");
+            this.SQLDatabase = new SQLDatabase(getDataFolder().getAbsolutePath() + "/skills.db", this);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -52,6 +56,11 @@ public class UltimateSkills  extends JavaPlugin {
             this.SQLDatabase.closeConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+    public void registerEvents(List<Listener> listeners) {
+        for (Listener listener : listeners) {
+            Bukkit.getPluginManager().registerEvents(listener, this);
         }
     }
 

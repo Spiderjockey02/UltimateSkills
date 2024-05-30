@@ -57,6 +57,6 @@ public class PlayerSkill {
 
     @Override
     public String toString() {
-        return "UUID" + this.uuid.toString() + this.type.toString() + this.level + this.points;
+        return "UUID: " + this.uuid.toString() + ", type: " + this.type.toString() + ", level: " + this.level + ", points: " + this.points;
     }
 }

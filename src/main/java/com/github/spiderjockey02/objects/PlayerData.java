@@ -41,6 +41,11 @@ public class PlayerData {
     public void addSkill(SkillType skillType, PlayerSkill playerSkill) {
         this.skills.put(skillType, playerSkill);
     }
+
+    @Override
+    public String toString() {
+        return "UUID: " + this.uuid.toString() + ", totalPoints: " + this.totalPoints;
+    }
 }
 
 

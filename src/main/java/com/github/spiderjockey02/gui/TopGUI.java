@@ -53,7 +53,7 @@ public class TopGUI implements GUI {
         // Get player head
         SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerData.getUuid());
-        skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getName()));
+        skullMeta.setOwningPlayer(player);
 
         // Add title
         skullMeta.setDisplayName(StringUtils.color("&a" + player.getName()));

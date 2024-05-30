@@ -10,11 +10,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
-    private final UltimateSkills plugin;
     public final List<UltimateCommand> commands = new ArrayList<>();
 
-    public CommandManager(UltimateSkills plugin) {
-        this.plugin = plugin;
+    public CommandManager() {
         UltimateSkills.getInstance().getCommand("skills").setExecutor(this);
         UltimateSkills.getInstance().getCommand("skills").setTabCompleter(this);
         registerCommands();

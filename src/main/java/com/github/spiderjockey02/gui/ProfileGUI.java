@@ -71,7 +71,7 @@ public class ProfileGUI implements GUI {
             itemStackMeta.setDisplayName(StringUtils.color("&F&l" + skillType.getName()));
 
             // Create lore to display player stats
-            int XpNeeded = UltimateSkills.getInstance().getConfigManager().levels.get(currentLvl+1).getXpNeeded();
+            int XpNeeded = UltimateSkills.getInstance().getConfigManager().skills.get(skillType).getLevel(currentLvl+1).getXpNeeded();
 
             ArrayList<String> lore = new ArrayList<String>();
             lore.add(StringUtils.color("&fLevel: " + StringUtils.formatNumber(currentLvl)));

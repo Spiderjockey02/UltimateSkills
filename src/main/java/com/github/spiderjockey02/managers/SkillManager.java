@@ -2,6 +2,7 @@ package com.github.spiderjockey02.managers;
 
 import com.github.spiderjockey02.UltimateSkills;
 import com.github.spiderjockey02.enums.SkillType;
+import com.github.spiderjockey02.objects.ConfigSkillData;
 import com.github.spiderjockey02.objects.PlayerData;
 import com.github.spiderjockey02.objects.PlayerSkill;
 import com.github.spiderjockey02.utils.StringUtils;
@@ -25,16 +26,36 @@ public class SkillManager {
         // Ignore the interaction of player was in creative
         if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
+        // Get list of blocks
+        ConfigManager configManager = plugin.getConfigManager();
+        List<Material> MiningBlocks = configManager.getSkill(SkillType.MINING).getBlocks();
+        List<Material> LumberingBlocks = configManager.getSkill(SkillType.LUMBERING).getBlocks();
+        List<Material> farmingBlocks = configManager.getSkill(SkillType.FARMING).getBlocks();
+
         // Now check if it was an ore, wood or farm item
         Material material = block.getType();
-        if (material == Material.OAK_LOG) {
-            this.addPoints(player.getUniqueId(), SkillType.LUMBERING);
-        } else if (material == Material.STONE) {
+        if (configManager.isDebugEnabled()) plugin.getLogger().info(player.getName() + " has just mined block: " + material);
+
+        // For debugging purposes and adding points to correct skill type
+        if (MiningBlocks.contains(material) && configManager.getSkill(SkillType.MINING).isEnabled()) {
+            if (configManager.isDebugEnabled()) plugin.getLogger().info("Block was found in MiningBlock array, giving them points.");
             this.addPoints(player.getUniqueId(), SkillType.MINING);
-        } else if (material == Material.WHEAT) {
-            // Check if the crop is fully grown
-            if (block.getBlockData() instanceof Ageable ageable) {
+        }
+
+        // For debugging purposes and adding points to correct skill type
+        if (LumberingBlocks.contains(material) && configManager.getSkill(SkillType.LUMBERING).isEnabled()) {
+            if (configManager.isDebugEnabled()) plugin.getLogger().info("Block was found in LumberingBlocks array, giving them points.");
+            this.addPoints(player.getUniqueId(), SkillType.LUMBERING);
+        }
+
+        // For debugging purposes and adding points to correct skill type
+        if (farmingBlocks.contains(material) && configManager.getSkill(SkillType.FARMING).isEnabled()) {
+            if (configManager.isDebugEnabled()) plugin.getLogger().info("Block was found in farmingBlocks array, check age.");
+            // Add another check to ensure the crop was fully grown
+            if (block.getBlockData() instanceof Ageable) {
+                Ageable ageable = (Ageable) block.getBlockData();
                 if (ageable.getAge() == ageable.getMaximumAge()) {
+                    if (configManager.isDebugEnabled()) plugin.getLogger().info("Crop was fully grown, giving them points.");
                     // The wheat is fully grown
                     this.addPoints(player.getUniqueId(), SkillType.FARMING);
                 }
@@ -43,17 +64,20 @@ public class SkillManager {
     }
 
     public void addPoints(UUID playerId, SkillType type) {
+        // Get Config manager
+        ConfigSkillData skillData = plugin.getConfigManager().skills.get(type);
+
         // Fetch how many points to add from config file
-        int points = this.plugin.getConfigManager().fetchPoints(type);
+        int points = skillData.getDefaultPoints();
 
         // Check if it's first time or not
         PlayerData playerData = this.getPlayerData(playerId);
-
 
         // Fetch or create player skill data
         PlayerSkill playerSkill = this.getPlayerSkill(playerId,type);
 
         // Add XP to user and refresh cache
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("Giving player:" + playerId + " " + points + " to skill: " + type);
         playerSkill.addPoints(points);
         playerData.updateTotalPoints(points);
         this.tempData.put(playerId, playerData);
@@ -61,14 +85,16 @@ public class SkillManager {
         // Check for level up
         int level = playerSkill.getLevel();
         int currentXp = playerSkill.getPoints();
-        if (currentXp >= this.plugin.getConfigManager().levels.get(level+1).getXpNeeded()) {
+        if (currentXp >= skillData.getLevel(level+1).getXpNeeded()) {
             int newLevel = level + 1;
+
             // Send level up message to player
+            if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("Player: " + playerId + " has just leveled up to " + newLevel);
             Player player = this.plugin.getServer().getPlayer(playerId);
             player.sendMessage(StringUtils.color("&6&lSkills &7» You have just levelled up to: &l&f" + newLevel + "&7."));
 
             // Get commands to run for rewards
-            List<String> commands = this.plugin.getConfigManager().levels.get(newLevel).getCommands();
+            List<String> commands = skillData.getLevel(level+1).getCommands();
             for (String command : commands) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
             }
@@ -140,6 +166,9 @@ public class SkillManager {
         return this.plugin.getDatabaseManager().getTopPlayersBySkillType(skillType);
     }
 
+    public void removePlayer(UUID playerId) {
+        this.tempData.remove(playerId);
+    }
     public List<PlayerData> getTopPlayers() {
         return this.plugin.getDatabaseManager().getTopPlayers();
     }

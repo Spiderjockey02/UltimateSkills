@@ -24,4 +24,9 @@ public class LevelData {
     public List<String> getCommands() {
         return commands;
     }
+
+    @Override
+    public String toString() {
+        return "xpNeeded: " + xpNeeded + ", lore: " + lore + ", commands: " + commands;
+    }
 }

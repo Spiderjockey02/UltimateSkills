@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class LevelGUI implements GUI {
 
         // Fetch levels from config file
         int index = 0;
-        Map<Integer, LevelData> levels = UltimateSkills.getInstance().getConfigManager().levels;
+        Map<Integer, LevelData> levels = UltimateSkills.getInstance().getConfigManager().getSkill(type).getLevels();
         for (Map.Entry<Integer, LevelData> level : levels.entrySet()) {
             ItemStack item = this.createItem(player.getSkill(this.type), level.getValue(), index+1);
             inventory.setItem(positions.get(index), item);

@@ -10,9 +10,11 @@ import java.util.*;
 
 public class SQLDatabase extends Database {
     private final Connection connection;
+    private final UltimateSkills plugin;
 
-    public SQLDatabase(String path) throws SQLException {
+    public SQLDatabase(String path, UltimateSkills plugin) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+        this.plugin = plugin;
 
         try (Statement statement = connection.createStatement()) {
             // Try and create Skills table
@@ -33,10 +35,13 @@ public class SQLDatabase extends Database {
     }
 
     public void closeConnection() throws SQLException {
+
         if (connection != null && !connection.isClosed()) connection.close();
     }
 
     public PlayerData fetchPlayerByUUID(UUID playerId) {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Fetching player data for player: " + playerId);
+
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Players WHERE uuid =?")) {
             statement.setString(1, playerId.toString());
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -47,12 +52,14 @@ public class SQLDatabase extends Database {
                 }
             }
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return null;
     }
 
     public Integer fetchPlayerCount() {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Fetching player count");
+
         try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM Players")) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -60,12 +67,14 @@ public class SQLDatabase extends Database {
                 }
             }
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return 0;
     }
 
     public Map<SkillType, PlayerSkill> fetchPlayerSkills(UUID playerId)  {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Fetching player skills");
+
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Skills WHERE uuid=?")) {
             statement.setString(1, playerId.toString());
             try (ResultSet data = statement.executeQuery()) {
@@ -82,34 +91,37 @@ public class SQLDatabase extends Database {
                 return skills;
             }
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return new HashMap<>();
     }
 
     public PlayerData addPlayer(UUID playerId) {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Adding player: " + playerId);
         try (PreparedStatement statement = connection.prepareStatement("INSERT INTO Players (uuid) VALUES (?)")) {
             statement.setString(1, playerId.toString());
             statement.executeUpdate();
             return fetchPlayerByUUID(playerId);
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return null;
     }
 
     public Integer addPlayerSkill(UUID playerId, SkillType type) {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Adding player skill: " + playerId);
         try (PreparedStatement statement = connection.prepareStatement("INSERT INTO Skills (uuid, type) VALUES (?, ?)")) {
             statement.setString(1, playerId.toString());
             statement.setString(2, type.toString());
             return statement.executeUpdate();
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return -1;
     }
 
     public Map<SkillType, PlayerSkill> updatePlayerSkill(UUID playerId, SkillType type, Integer newLevel, Integer newPoint) throws SQLException {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Updating player's skill: " + playerId);
         try (PreparedStatement statement = connection.prepareStatement("UPDATE Skills SET level = ?, points = ? WHERE uuid = ? AND type = ?")) {
             statement.setInt(1, newLevel);
             statement.setInt(2, newPoint);
@@ -121,17 +133,19 @@ public class SQLDatabase extends Database {
     }
 
     public Integer updatePlayer(UUID playerId, Integer newPoints) {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Updating player: " + playerId);
         try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET totalPoints = ? WHERE uuid = ?")) {
             statement.setInt(1, newPoints);
             statement.setString(2, playerId.toString());
             return statement.executeUpdate();
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
         return -1;
     }
 
     public List<PlayerData> getTopPlayers() {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Fetching top players");
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Players ORDER BY totalPoints DESC LIMIT 10")) {
             ResultSet data = statement.executeQuery();
             List<PlayerData> players = new ArrayList<>();
@@ -142,12 +156,13 @@ public class SQLDatabase extends Database {
             }
             return players;
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
-        return List.of();
+        return new ArrayList<>();
     }
 
     public List<PlayerData> getTopPlayersBySkillType(SkillType skillType) {
+        if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("[DATABASE] Fetching top players by skill type: " + skillType);
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Skills ORDER BY points DESC LIMIT 10 WHERE type = ?")) {
             statement.setString(1, skillType.toString());
             ResultSet data = statement.executeQuery();
@@ -159,8 +174,8 @@ public class SQLDatabase extends Database {
             }
             return players;
         } catch (SQLException e) {
-            UltimateSkills.getInstance().getLogger().info(e.getMessage());
+            plugin.getLogger().info(e.getMessage());
         }
-        return List.of();
+        return new ArrayList<>();
     }
 }
