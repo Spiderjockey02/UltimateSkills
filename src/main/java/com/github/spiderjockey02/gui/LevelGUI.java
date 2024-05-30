@@ -80,7 +80,7 @@ public class LevelGUI implements GUI {
         // Create lore for player stats
         ArrayList<String> lore = new ArrayList<String>();
         lore.add(StringUtils.color("&fProgress:"));
-        lore.add(StringUtils.color("&fExperience: " + userPoints +" / " + leveldata.getXpNeeded()));
+        lore.add(StringUtils.color("&fExperience: " + StringUtils.formatNumber(userPoints) +" / " + StringUtils.formatNumber(leveldata.getXpNeeded())));
         lore.add(StringUtils.color("&fProgress: &8[&r" + StringUtils.getProgressBar(userPoints, leveldata.getXpNeeded(), 20, '|', "&a", "&c") + "&8]"));
         lore.add("");
         lore.add(StringUtils.color("&fRewards:"));
@@ -108,8 +108,8 @@ public class LevelGUI implements GUI {
         // Create lore for player stats
         ArrayList<String> lore = new ArrayList<String>();
         lore.add(StringUtils.color("&fProgress:"));
-        lore.add(StringUtils.color("&fXP: " + userPoints));
-        lore.add(StringUtils.color("&fLevel: " + userLevel));
+        lore.add(StringUtils.color("&fXP: " + StringUtils.formatNumber(userPoints)));
+        lore.add(StringUtils.color("&fLevel: " + StringUtils.formatNumber(userLevel)));
 
         itemStackMeta.setLore(lore);
         item.setItemMeta(itemStackMeta);

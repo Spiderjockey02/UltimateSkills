@@ -56,7 +56,7 @@ public class TopGUI implements GUI {
         skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getName()));
 
         // Add title
-        skull.getItemMeta().setDisplayName(StringUtils.color("&a" + player.getName()));
+        skullMeta.setDisplayName(StringUtils.color("&a" + player.getName()));
 
         // Add Lore
         ArrayList<String> lore = new ArrayList<String>();

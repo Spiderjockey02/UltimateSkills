@@ -74,8 +74,8 @@ public class ProfileGUI implements GUI {
             int XpNeeded = UltimateSkills.getInstance().getConfigManager().levels.get(currentLvl+1).getXpNeeded();
 
             ArrayList<String> lore = new ArrayList<String>();
-            lore.add(StringUtils.color("&fLevel: " + currentLvl));
-            lore.add(StringUtils.color("&fExperience: " +currentXp));
+            lore.add(StringUtils.color("&fLevel: " + StringUtils.formatNumber(currentLvl)));
+            lore.add(StringUtils.color("&fExperience: " + StringUtils.formatNumber(currentXp)));
             lore.add(StringUtils.color("&fProgress: &8[&r" + StringUtils.getProgressBar(currentXp, XpNeeded, 20, '|', "&a", "&c") + "&8]"));
             lore.add("");
             lore.add(StringUtils.color("&fRanking: &a#" + skillManager.getPlayerPosBySkillType(this.uuid, skillType) + " &f/ &c" + skillManager.getTotalPlayers(skillType)));
