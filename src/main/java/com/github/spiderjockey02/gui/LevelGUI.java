@@ -42,7 +42,7 @@ public class LevelGUI implements GUI {
 
         // Create inventory and layout
         Inventory inventory = Bukkit.createInventory(this, 45, StringUtils.color("&lSKILL " + this.type.getName()));
-        List<Integer> positions = List.of(1,10,19,28,29,30,21,12,3,4,5,14,23,32,33,34,25,16,7);
+        List<Integer> positions = Arrays.asList(1,10,19,28,29,30,21,12,3,4,5,14,23,32,33,34,25,16,7);
 
         // Fetch levels from config file
         int index = 0;

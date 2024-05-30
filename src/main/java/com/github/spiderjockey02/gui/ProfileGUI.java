@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,7 +54,7 @@ public class ProfileGUI implements GUI {
     }
 
     private List<ItemStack> createSkillItem(PlayerData data, SkillManager skillManager) {
-        List<Material> materials = List.of(Material.STONE, Material.WHEAT, Material.DIAMOND_SWORD, Material.FISHING_ROD, Material.DIAMOND_AXE);
+        List<Material> materials = Arrays.asList(Material.STONE, Material.WHEAT, Material.DIAMOND_SWORD, Material.FISHING_ROD, Material.DIAMOND_AXE);
         List<ItemStack> items = new ArrayList<>();
         int index = 0;
         for (SkillType skillType : SkillType.values()) {

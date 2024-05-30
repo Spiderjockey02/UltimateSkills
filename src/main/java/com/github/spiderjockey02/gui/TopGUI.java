@@ -14,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TopGUI implements GUI {
         List<PlayerData> topPlayers = skillManager.getTopPlayers();
 
         int index = 0;
-        List<Integer> positions = List.of(4,12,14,20,24);
+        List<Integer> positions = Arrays.asList(4,12,14,20,24);
         for (PlayerData playerData : topPlayers) {
             if (index > 4) break;
             ItemStack head = this.createHead(playerData);
