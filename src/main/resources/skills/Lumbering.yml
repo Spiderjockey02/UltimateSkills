@@ -17,11 +17,11 @@ levels:
     lore:
       - '&f$10,000'
     commands:
-      - '[money] 10000 %player%'
+      - '[money] %player% 10000'
   '2':
     xpneeded: 150000
     commands:
-      - 'Say hi %player%'
+      - '[message] Nice congratulations on the level up.'
   '3':
     xpneeded: 350000
   '4':

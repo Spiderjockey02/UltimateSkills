@@ -78,7 +78,7 @@ public class ConfigManager {
 
     private Map<Integer, LevelData> getLevels(YamlConfiguration config) {
         ConfigurationSection levelSection = config.getConfigurationSection("levels");
-        System.out.println(levelSection.getKeys(false));
+
         Map<Integer, LevelData> levels = new HashMap<>();
         for(String key : levelSection.getKeys(false)) {
             int xpNeeded = config.getInt("levels." + key + ".xpneeded");

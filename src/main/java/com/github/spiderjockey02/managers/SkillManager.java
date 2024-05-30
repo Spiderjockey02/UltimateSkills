@@ -1,6 +1,7 @@
 package com.github.spiderjockey02.managers;
 
 import com.github.spiderjockey02.UltimateSkills;
+import com.github.spiderjockey02.addons.VaultAPIManager;
 import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.objects.ConfigSkillData;
 import com.github.spiderjockey02.objects.PlayerData;
@@ -13,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SkillManager {
     private final UltimateSkills plugin;
@@ -74,7 +76,7 @@ public class SkillManager {
         PlayerData playerData = this.getPlayerData(playerId);
 
         // Fetch or create player skill data
-        PlayerSkill playerSkill = this.getPlayerSkill(playerId,type);
+        PlayerSkill playerSkill = this.getPlayerSkill(playerId, type);
 
         // Add XP to user and refresh cache
         if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("Giving player:" + playerId + " " + points + " to skill: " + type);
@@ -83,24 +85,47 @@ public class SkillManager {
         this.tempData.put(playerId, playerData);
 
         // Check for level up
+        checkLevelUp(playerData, type);
+    }
+
+    public void checkLevelUp(PlayerData playerData, SkillType type) {
+        // Fetch or create player skill data
+        PlayerSkill playerSkill = this.getPlayerSkill(playerData.getUuid(), type);
+
+        // Get Config manager
+        ConfigSkillData skillData = plugin.getConfigManager().skills.get(type);
+        // Check for level up
         int level = playerSkill.getLevel();
         int currentXp = playerSkill.getPoints();
         if (currentXp >= skillData.getLevel(level+1).getXpNeeded()) {
             int newLevel = level + 1;
 
             // Send level up message to player
-            if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("Player: " + playerId + " has just leveled up to " + newLevel);
-            Player player = this.plugin.getServer().getPlayer(playerId);
+            if (plugin.getConfigManager().isDebugEnabled()) plugin.getLogger().info("Player: " + playerData.getUuid() + " has just leveled up to " + newLevel);
+            Player player = this.plugin.getServer().getPlayer(playerData.getUuid());
             player.sendMessage(StringUtils.color("&6&lSkills &7» You have just levelled up to: &l&f" + newLevel + "&7."));
 
             // Get commands to run for rewards
             List<String> commands = skillData.getLevel(level+1).getCommands();
             for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+                String newCommand = command.replace("%player%", player.getName());
+
+                // Check for inbuilt API request
+                if (newCommand.startsWith("[money]")) {
+                    // Use Vault API to give money directly without using commands.
+                    String[] args = newCommand.split("\\s+");
+                    VaultAPIManager vaultAPIManager = new VaultAPIManager();
+                    vaultAPIManager.deposit(player.getUniqueId(), Integer.parseInt(args[2]));
+                } else if (newCommand.startsWith("[message]")) {
+                    // Send a message directly to the user
+                    player.sendMessage(newCommand.replace("[message] ", ""));
+                } else {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), newCommand);
+                }
             }
 
             // Update player's level
-            this.tempData.get(playerId).getSkill(type).updateLevel(newLevel);
+            this.tempData.get(playerData.getUuid()).getSkill(type).updateLevel(newLevel);
         }
     }
 
@@ -149,9 +174,9 @@ public class SkillManager {
         // Fetch from database
         List<Map.Entry<UUID, PlayerSkill>> sortedPlayers = this.tempData.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getValue().getSkill(type) != null)
-                .map(entry -> Map.entry(entry.getKey(), entry.getValue().getSkill(type)))
-                .sorted((e1, e2) -> Integer.compare(e2.getValue().getPoints(), e1.getValue().getPoints()))// Sort by score in descending order
-                .toList();
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().getSkill(type)))
+                .sorted((e1, e2) -> Integer.compare(e2.getValue().getPoints(), e1.getValue().getPoints()))
+                .collect(Collectors.toList());
 
         for (int i = 0; i < sortedPlayers.size(); i++) {
             if (sortedPlayers.get(i).getKey().equals(playerId)) {
