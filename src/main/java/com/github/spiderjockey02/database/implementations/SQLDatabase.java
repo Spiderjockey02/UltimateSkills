@@ -1,13 +1,14 @@
-package com.github.spiderjockey02.database;
+package com.github.spiderjockey02.database.implementations;
 
 import com.github.spiderjockey02.UltimateSkills;
+import com.github.spiderjockey02.database.Database;
 import com.github.spiderjockey02.enums.SkillType;
 import com.github.spiderjockey02.objects.PlayerData;
 import com.github.spiderjockey02.objects.PlayerSkill;
 import java.sql.*;
 import java.util.*;
 
-public class SQLDatabase extends Database  {
+public class SQLDatabase extends Database {
     private final Connection connection;
 
     public SQLDatabase(String path) throws SQLException {

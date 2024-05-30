@@ -3,7 +3,7 @@ package com.github.spiderjockey02;
 import com.github.spiderjockey02.commands.CommandManager;
 import com.github.spiderjockey02.managers.ConfigManager;
 import com.github.spiderjockey02.database.Database;
-import com.github.spiderjockey02.database.SQLDatabase;
+import com.github.spiderjockey02.database.implementations.SQLDatabase;
 import com.github.spiderjockey02.listeners.BlockBreakListener;
 import com.github.spiderjockey02.listeners.EntityDeathListener;
 import com.github.spiderjockey02.listeners.FishingListener;
@@ -39,6 +39,7 @@ public class UltimateSkills  extends JavaPlugin {
 
         // Initialise database
         try {
+            // Check if connection should be MySQL or SQLite
             this.SQLDatabase = new SQLDatabase(getDataFolder().getAbsolutePath() + "/skills.db");
         } catch (SQLException e) {
             throw new RuntimeException(e);
