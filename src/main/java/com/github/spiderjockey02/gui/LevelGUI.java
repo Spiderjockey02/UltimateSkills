@@ -23,10 +23,10 @@ public class LevelGUI implements GUI {
     private final UUID uuid;
     private final SkillType type;
 
-
     public LevelGUI(UUID playerId, SkillType type) {
         this.uuid = playerId;
         this.type = type;
+
     }
 
     @Override
@@ -42,13 +42,14 @@ public class LevelGUI implements GUI {
 
         // Create inventory and layout
         Inventory inventory = Bukkit.createInventory(this, 45, StringUtils.color("&lSKILL " + this.type.getName()));
-        List<Integer> positions = Arrays.asList(1,10,19,28,29,30,21,12,3,4,5,14,23,32,33,34,25,16,7);
+        List<Integer> positions = Arrays.asList(0,1,10,19,28,29,30,21,12,3,4,5,14,23,32,33,34,25,16,7);
 
         // Fetch levels from config file
-        int index = 0;
+        int index = 1;
         Map<Integer, LevelData> levels = UltimateSkills.getInstance().getConfigManager().getSkill(type).getLevels();
         for (Map.Entry<Integer, LevelData> level : levels.entrySet()) {
-            ItemStack item = this.createItem(player.getSkill(this.type), level.getValue(), index+1);
+            ItemStack item = this.createItem(player.getSkill(this.type), level.getValue(), index);
+            item.setAmount(index);
             inventory.setItem(positions.get(index), item);
             index++;
         }

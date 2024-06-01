@@ -48,8 +48,22 @@ public class ProfileGUI implements GUI {
         int slot = e.getSlot();
         e.setCancelled(true);
 
-        if (slot == 0) {
-            player.openInventory(new LevelGUI(this.uuid, SkillType.MINING).getInventory());
+        switch (slot) {
+            case 0:
+                player.openInventory(new LevelGUI(this.uuid, SkillType.MINING).getInventory());
+                break;
+            case 2:
+                player.openInventory(new LevelGUI(this.uuid, SkillType.FARMING).getInventory());
+                break;
+            case 4:
+                player.openInventory(new LevelGUI(this.uuid, SkillType.COMBAT).getInventory());
+                break;
+            case 6:
+                player.openInventory(new LevelGUI(this.uuid, SkillType.FISHING).getInventory());
+                break;
+            case 8:
+                player.openInventory(new LevelGUI(this.uuid, SkillType.LUMBERING).getInventory());
+                break;
         }
     }
 
