@@ -165,7 +165,6 @@ public class SkillManager {
 
     public Integer getTotalPlayers(SkillType type) {
         return this.plugin.getDatabaseManager().fetchPlayerCount();
-
     }
 
     public Integer getPlayerPosBySkillType(UUID playerId, SkillType type) {
@@ -194,6 +193,7 @@ public class SkillManager {
     public void removePlayer(UUID playerId) {
         this.tempData.remove(playerId);
     }
+
     public List<PlayerData> getTopPlayers() {
         return this.plugin.getDatabaseManager().getTopPlayers();
     }

@@ -99,4 +99,8 @@ public class ConfigManager {
     public Boolean isDebugEnabled() {
         return plugin.getConfig().getBoolean("debug");
     };
+
+    public Boolean isMobStackRespected() {
+        return !plugin.getConfig().getBoolean("mobStackingCountAsOne");
+    }
 }
