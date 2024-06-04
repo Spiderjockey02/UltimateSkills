@@ -3,6 +3,7 @@ package com.github.spiderjockey02.objects;
 import com.github.spiderjockey02.enums.SkillType;
 import org.bukkit.Material;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,10 @@ public class ConfigSkillData {
 
     public Map<Integer, LevelData> getLevels() {
         return levels;
+    }
+
+    public Integer getMaxLevel() {
+        return Collections.max(levels.keySet());
     }
 
     public Boolean isEnabled() {
